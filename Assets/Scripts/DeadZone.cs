@@ -1,15 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class DeadZone : MonoBehaviour
 {
-
+    public static UnityAction DeadZoneAction;
     public GameObject startPoint;
     public GameObject Player;
+    public PlayerMove player;
     // Start is called before the first frame update
-    void Start()
+    void OnEnable()
     {
+       player = Player.GetComponent<PlayerMove>(); 
         
     }
 
@@ -23,7 +26,17 @@ public class DeadZone : MonoBehaviour
     {
         if(other.gameObject.CompareTag("Player"))
         {
-            Player.transform.position = startPoint.transform.position;
+            DeadZoneAction?.Invoke();
+            
+            Invoke("ResetPlayer", 2f);
+            
         }
+    }
+
+    private void ResetPlayer()
+    {
+        Player.transform.position = startPoint.transform.position;
+        player.AlivePlayer();
+
     }
 }

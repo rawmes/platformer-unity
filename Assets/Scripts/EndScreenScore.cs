@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.SceneManagement;
+using UnityEditor;
 
 public class EndScreenScore : MonoBehaviour
 {
@@ -12,7 +13,9 @@ public class EndScreenScore : MonoBehaviour
     public TextMeshProUGUI highScoreRef;
     private int currentScore;
     private int highScore;
-    
+
+    public TextMeshProUGUI music;
+    public TextMeshProUGUI sfx;
 
     
     // Start is called before the first frame update
@@ -67,5 +70,39 @@ public class EndScreenScore : MonoBehaviour
         SceneManager.LoadScene("level_00l");
     }
 
+
+    public void MusicPressed()
+    {
+        if (BGMusic.Instance.music)
+        {
+            BGMusic.Instance.music = false;
+            
+            BGMusic.Instance.Stop();
+            music.text = "Off";
+        }
+        else
+        {
+            BGMusic.Instance.music =true;
+            BGMusic.Instance.Play();  
+            music.text="On";
+        }
+    }
+
+    public void SfxPressed()
+    {
+        if (BGMusic.Instance.sfx)
+        {
+            
+            BGMusic.Instance.ChangeSfx(false);
+            sfx.text = "Off";
+        }
+        else
+        {
+            
+            BGMusic.Instance.ChangeSfx(true);
+            sfx.text = "On";
+        }
+        
+    }
  
 }

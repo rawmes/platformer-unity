@@ -9,25 +9,30 @@ public class PauseMenuScript : MonoBehaviour
 
     public GameObject androidUI;
 
+    public bool androidPause;
+
 
     // Start is called before the first frame update
     void Start()
     {
-        Cursor.visible= false;
+        Cursor.visible = false;
 
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.Escape) || androidPause)
         {
+            androidPause = false;
+
             if(!pauseMenu.activeSelf)
             {
                 Time.timeScale = 0f;
                 androidUI.SetActive(false);
                 pauseMenu.SetActive(true);
                 Cursor.visible = true;
+                
             
             }else{
                 Time.timeScale = 1f;
@@ -48,5 +53,11 @@ public class PauseMenuScript : MonoBehaviour
         pauseMenu.SetActive(false);
         androidUI.SetActive(true);
         Cursor.visible = false;
+       
     }    
+
+    public void Pause()
+    {
+        androidPause = true;
+    }
 }
