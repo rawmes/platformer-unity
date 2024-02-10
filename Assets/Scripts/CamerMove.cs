@@ -12,7 +12,7 @@ public class CamerMove : MonoBehaviour
 
     private Vector3 velocity = Vector3.zero;
 
-    void FixedUpdate()
+    void Update()
     {
         Vector3 movePos = target.position+offset;
         transform.position = Vector3.SmoothDamp(transform.position,movePos,ref velocity, damping); 

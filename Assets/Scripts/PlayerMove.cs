@@ -7,9 +7,17 @@ using UnityEngine.InputSystem;
 
 public class PlayerMove : MonoBehaviour
 {
+    public GameObject walkingSound;
+    public AudioSource jumpSound;
+    public AudioSource deathSound;
+    
+
+    Vector3 jumpStop = new Vector3 (1f, 0f, 1f);
+
+   
 
     public InputAction playerControl;
-    public static event Action OnJump;
+    
 
     public Transform attackPoint;
     public float attackRange= 0.64f;
@@ -20,7 +28,7 @@ public class PlayerMove : MonoBehaviour
 
 
     public float speed;
-    private float Move;
+
 
     public float jumpForce;
 
@@ -38,20 +46,24 @@ public class PlayerMove : MonoBehaviour
 
     private Vector3 refVel = Vector3.zero;
 
-    private Animator animator;
+    public Animator animator;
 
     private bool isFacingRight;
-
+    public bool canMove=true;
     private float dampFactor;
     
     private void OnEnable()
     {
         playerControl.Enable();
+        DeadZone.DeadZoneAction += KillPlayer;
+        
+
     }
 
     private void OnDisable()
     {
         playerControl.Disable();
+        DeadZone.DeadZoneAction -= KillPlayer;
     
     }
 
@@ -61,15 +73,19 @@ public class PlayerMove : MonoBehaviour
         jumpCounter = numberOfJumps;
 
         rb = gameObject.GetComponent<Rigidbody2D>();
-        animator = GetComponent<Animator>();    
+        
+        //DontDestroyOnLoad(animator);
+            
     }
 
     // Update is called once per frame
     void Update()
     {
-
+        
+        
         //moving the player
         // Move = Input.GetAxis("Horizontal");
+        
         
         Vector3 newVel = new Vector2(speed*inputX, rb.velocity.y);
         
@@ -81,7 +97,28 @@ public class PlayerMove : MonoBehaviour
         {
              dampFactor = momentum;
         }
-        rb.velocity = Vector3.SmoothDamp(rb.velocity,newVel,ref refVel, dampFactor); 
+
+
+
+        if (canMove)
+        {
+            rb.velocity = Vector3.SmoothDamp(rb.velocity, newVel, ref refVel, dampFactor);
+            if(newVel.x != 0 && !isJumping)
+            {
+                walkingSound.SetActive(true);
+            }
+            else
+            {
+                walkingSound.SetActive(false);
+            }
+            
+        }
+        else
+        {
+            rb.velocity = Vector2.zero;
+           
+        }
+       
        // Debug.Log($"{rb.velocity}");
 
         
@@ -90,22 +127,39 @@ public class PlayerMove : MonoBehaviour
         }
     }
     
-    public void move(InputAction.CallbackContext context)
+    public void Move(InputAction.CallbackContext context)
     {
-        inputX = context.ReadValue<Vector2>().x;
 
+        
+           
+
+        inputX = context.ReadValue<Vector2>().x;
+        
+        
+        
+             
         if(inputX > 0)
         {
+            
             animator.SetBool("isRunning",true);
+
             isFacingRight = true;
             transform.localRotation = Quaternion.Euler(0,0,0);
+            
         }else if(inputX < 0){
+
+            
             animator.SetBool("isRunning",true);
+
+
             isFacingRight = false;
             transform.localRotation = Quaternion.Euler(0,180,0);
             
+
+            
             
         }else{
+            
             animator.SetBool("isRunning",false);
             
         }
@@ -114,34 +168,46 @@ public class PlayerMove : MonoBehaviour
 
     public void jump(InputAction.CallbackContext context)
     {
-        if(context.started )
+        if (!canMove) return;
+
+        if (context.started )
         {
-            animator.SetBool("isJumping",true);
-            if(jumpCounter >0 || !isJumping)
+            animator.SetBool("isJumping", true);
+            if (jumpCounter >0 || !isJumping)
             {
+                rb.velocity *= jumpStop;
 
-               
-                //Debug.Log($"{rb.velocity.y}");
-                if(rb.velocity.x < 0f && transform.parent)
+                rb.velocity = rb.velocity + Vector2.up * jumpForce;
+
+                
+                jumpSound.Play();
+                
+                if(isJumping)
                 {
-                    Debug.Log(transform.parent);
-                    rb.velocity = new Vector2(rb.velocity.x,jumpForce*0.8f+Time.deltaTime);
-                    jumpCounter -= 1;
-                   // Debug.Log($"jump{jumpCounter}");    
+                    jumpCounter--;
+                }
+                
+                ////Debug.Log($"{rb.velocity.y}");
+                //if(rb.velocity.x < 0f && transform.parent)
+                //{
+                //    Debug.Log(transform.parent);
+                //    rb.velocity = new Vector2(rb.velocity.x,jumpForce*0.8f+Time.deltaTime);
+                //    jumpCounter -= 1;
+                //   // Debug.Log($"jump{jumpCounter}");    
 
-                }else{
-                    rb.velocity = new Vector2(rb.velocity.x,rb.velocity.y+jumpForce+Time.deltaTime);
-                    jumpCounter -= 1;
-                   // Debug.Log($"jump{jumpCounter}"); 
+                //}else{
+                //    rb.velocity = new Vector2(rb.velocity.x,rb.velocity.y+jumpForce+Time.deltaTime);
+                //    jumpCounter -= 1;
+                //   // Debug.Log($"jump{jumpCounter}"); 
 
-                 }
+                // }
+
+                
                   
 
             
             }
 
-        }else{
-            animator.SetBool("isJumping",false);
         }
     }
 
@@ -178,7 +244,9 @@ public class PlayerMove : MonoBehaviour
         if(other.gameObject.CompareTag("Ground"))
         {
             jumpCounter = numberOfJumps;
+
             isJumping = false;
+            animator.SetBool("isJumping", false);
             //UnityEngine.Debug.Log("check");
         }
     }
@@ -186,13 +254,46 @@ public class PlayerMove : MonoBehaviour
     {
         if(other.gameObject.CompareTag("Ground"))
         {
+
             isJumping = true;
-            OnJump?.Invoke();
+            
+            jumpCounter--;
             
         }
     }
 
+    private void KillPlayer()
+    {
+        if(animator != null)
+        {
+            animator.SetTrigger("PlayerDeath");
+        }
+        
+        rb.velocity = Vector3.zero;
+        playerControl.Disable();
+        canMove = false;
 
+        
+        deathSound.Play();
+
+
+        walkingSound.SetActive(false);
+        
+    }
+
+    public void AlivePlayer()
+    {
+        playerControl.Enable();
+        if(animator != null)
+        {
+            animator.SetTrigger("PlayerSpawn");
+        }
+        
+        canMove = true;
+        isJumping = false;
+        jumpCounter = numberOfJumps;
+        walkingSound.SetActive(true);
+    }
 
     
 

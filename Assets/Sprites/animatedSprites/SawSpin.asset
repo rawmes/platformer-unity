@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13b75c95f34a00d4e8c04f76b73312e6, type: 3}
+  m_Name: SawSpin
+  m_EditorClassIdentifier: 
+  m_AnimatedSprites:
+  - {fileID: -3049067163339015078, guid: c016f0eb0a188a14ab7f86d910097523, type: 3}
+  - {fileID: 5023087293052794153, guid: c016f0eb0a188a14ab7f86d910097523, type: 3}
+  - {fileID: 3635640145415724294, guid: c016f0eb0a188a14ab7f86d910097523, type: 3}
+  - {fileID: -3382226459320202674, guid: c016f0eb0a188a14ab7f86d910097523, type: 3}
+  - {fileID: 6766133057857300771, guid: c016f0eb0a188a14ab7f86d910097523, type: 3}
+  - {fileID: -6071002419338243549, guid: c016f0eb0a188a14ab7f86d910097523, type: 3}
+  - {fileID: -7001973787898513139, guid: c016f0eb0a188a14ab7f86d910097523, type: 3}
+  - {fileID: -7336932856281768672, guid: c016f0eb0a188a14ab7f86d910097523, type: 3}
+  m_MinSpeed: 10
+  m_MaxSpeed: 10
+  m_AnimationStartTime: 0
+  m_AnimationStartFrame: 0
+  m_TileColliderType: 0
